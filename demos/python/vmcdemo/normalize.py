@@ -1,12 +1,18 @@
-ref = "TCTCAGCAGCATCT"
+# -*- coding: utf-8 -*-
+"""normalize an allele on a reference sequence
 
-# T|C|T|C|A|G|C|A|G|C|A|T|C|T
-#  |---| ⇒ A 
+A normalized Allele is:
+* Minimum length: the Allele cannot be written as a shorter Allele
+  that generates the same resulting sequence; and,
+* Right-aligned: the Allele cannot be written as another Allele with
+  numerically greater coordinates that would generate the same
+  resulting sequence.
 
+"""
 
 def trim_left(alleles):
     """remove common prefix from left of all alleles, returning
-    [number_trimmed, new_alleles]
+    (number_trimmed, [new_alleles])
 
     >>> trim_left(["","AA"])
     (0, ['', 'AA'])
@@ -26,29 +32,13 @@ def trim_left(alleles):
                 return trimmed, alleles
         alleles = [a[1:] for a in alleles]
         trimmed += 1
-    return trimmed, alleles
+    return (trimmed, alleles)
 
 
-def print_seq(seq):
-    p = "{:15s}".format("")
-    print(p + " ".join(list("01234567890123456789")))
-    print(p + "|" + "|".join(list(seq)) + "|")
-
-
-def print_allele(pos, allele):
-    start, end = pos
-    pfx = "[{:2d},{:2d})".format(start, end)
-    p = "{:15s}".format(pfx)
-    pos_str = p + "  " * start + "^"
-    # pos_str = p + "  "*(start) + "|"
-    if end > start:
-        pos_str += "—" + "——"*(end-start-1) + "^"
-    print(pos_str + " ⇒ " + allele)
-
-    
 def normalize(ref, pos, allele):
     """
-    
+    Normalize allele with respect to reference sequence and position
+
     >>> normalize(ref, (3,3), "CAG")
     ((11, 11), 'GCA')
     >>> normalize(ref, (4,4), "AGC")
@@ -64,8 +54,8 @@ def normalize(ref, pos, allele):
     start, end = pos
     ref_allele = ref[start:end]
 
-    print_seq(ref)
-    print_allele(pos, allele)
+    _print_seq(ref)
+    _print_allele(pos, allele)
 
     # remove common prefix and advance start
     trimmed, alleles = trim_left([ref_allele, allele])
@@ -73,7 +63,7 @@ def normalize(ref, pos, allele):
     start += trimmed
 
     while True:
-        print_allele((start, end), allele)
+        _print_allele((start, end), allele)
         #print(start,end, [ref_allele, allele])
         if end == len(ref):
             break
@@ -89,7 +79,29 @@ def normalize(ref, pos, allele):
     return ((start, end), allele)
 
 
+def _print_seq(seq):
+    p = "{:15s}".format("")
+    print(p + " ".join(list("01234567890123456789")))
+    print(p + "|" + "|".join(list(seq)) + "|")
+
+
+def _print_allele(pos, allele):
+    start, end = pos
+    pfx = "[{:2d},{:2d})".format(start, end)
+    p = "{:15s}".format(pfx)
+    pos_str = p + "  " * start + "^"
+    # pos_str = p + "  "*(start) + "|"
+    if end > start:
+        pos_str += "—" + "——"*(end-start-1) + "^"
+    print(pos_str + " ⇒ " + allele)
+
+
 if __name__ == "__main__":
+    ref = "TCTCAGCAGCATCT"
+    
+    # T|C|T|C|A|G|C|A|G|C|A|T|C|T
+    #  |---| ⇒ A 
+
     tests = [
         ((3, 3), "CAG"),
         ((4, 4), "AGC"),

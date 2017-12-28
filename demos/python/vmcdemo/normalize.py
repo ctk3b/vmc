@@ -3,6 +3,7 @@ ref = "TCTCAGCAGCATCT"
 # T|C|T|C|A|G|C|A|G|C|A|T|C|T
 #  |---| ⇒ A 
 
+
 def trim_left(alleles):
     """remove common prefix from left of all alleles, returning
     [number_trimmed, new_alleles]
@@ -27,18 +28,23 @@ def trim_left(alleles):
         trimmed += 1
     return trimmed, alleles
 
+
 def print_seq(seq):
     p = "{:15s}".format("")
+    print(p + " ".join(list("01234567890123456789")))
     print(p + "|" + "|".join(list(seq)) + "|")
+
 
 def print_allele(pos, allele):
     start, end = pos
-    pfx = "[{:2d},{:2d})".format(start,end)
+    pfx = "[{:2d},{:2d})".format(start, end)
     p = "{:15s}".format(pfx)
-    pos_str = p + "  "*(start) + "|"
+    pos_str = p + "  " * start + "^"
+    # pos_str = p + "  "*(start) + "|"
     if end > start:
-        pos_str += "—" + "——"*(end-start-1) + "|"
+        pos_str += "—" + "——"*(end-start-1) + "^"
     print(pos_str + " ⇒ " + allele)
+
     
 def normalize(ref, pos, allele):
     """
@@ -60,12 +66,12 @@ def normalize(ref, pos, allele):
 
     print_seq(ref)
     print_allele(pos, allele)
-    
+
     # remove common prefix and advance start
     trimmed, alleles = trim_left([ref_allele, allele])
     ref_allele, allele = alleles
     start += trimmed
-    
+
     while True:
         print_allele((start, end), allele)
         #print(start,end, [ref_allele, allele])
@@ -85,13 +91,12 @@ def normalize(ref, pos, allele):
 
 if __name__ == "__main__":
     tests = [
-        ((3,3), "CAG"),
-        ((4,4), "AGC"),
-        ((3,6), ""),
-        ((3,7), "C"),
-        ((3,8), "CA"),
+        ((3, 3), "CAG"),
+        ((4, 4), "AGC"),
+        ((3, 6), ""),
+        ((3, 7), "C"),
+        ((3, 8), "CA"),
     ]
     for t in tests:
         print("* " + str(t))
         print(normalize(ref, *t))
-    
